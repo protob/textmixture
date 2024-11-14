@@ -1,0 +1,18 @@
+EpisodeID: ep1
+epNumber: 1
+SeriesID: scitech_dialogues
+TopicID: quantum_computing
+localSources:
+  - input/quantum_intro.md
+urlSources:
+  - https://en.wikipedia.org/wiki/Quantum_computing
+title: Foundations of Quantum Computing
+about: Exploration of modern quantum computing breakthroughs
+topicsToCover:
+  - superconducting qubits
+  - quantum computers
+  - recent progress on quantum computing
+FocusID: technology
+defaultSpeakers:
+  - alice
+  - bob
