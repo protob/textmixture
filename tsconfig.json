@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "types": ["bun-types", "vitest"],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "lib": ["esnext"],
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@adapters/*": ["src/effects/adapters/*"],
+      "@providers/*": ["src/effects/providers/*"],
+      "@store/*": ["src/store/*"],
+      "@pipelines/*": ["src/core/app/pipelines/*"],
+      "@runners/*": ["src/core/app/runners/*"],
+      "@steps/*": ["src/core/app/steps/*"],
+      "@data-access/*": ["src/core/domain/data-access/*"],
+      "@models/*": ["src/core/domain/models/*"],
+      "@services/*": ["src/core/domain/services/*"],
+      "@utils/*": ["src/shared/utils/*"],
+      "@shared-types/*": ["src/shared/types/*"]
+    }
+  }
+}
