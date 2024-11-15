@@ -5,8 +5,10 @@ import { createYamlMetadataStore } from '@store/yaml-metadata-store';
 import { createFsAdapter } from '@adapters/common/fs-adapter';
 import { createUrlFsAdapter } from '@adapters/loaders/url-loader';
 import { createUrlContentService } from '@services/url-content-service';
+import { createOpenAIAdapter } from '@adapters/api/openai';
 import type { FullConfig } from '@models/yaml-metadata';
 import type { UrlContentPort } from '@data-access/url-content-port';
+import { DEFAULT_CONFIG } from '@models/app-config';
 
 export const initializeConfig = async (): Promise<FullConfig> => {
     const configStore = R.pipe(
@@ -59,4 +61,11 @@ export const createFsAndUrlServices = () => {
     const urlAdapter = createUrlFsAdapter(fsAdapter);
     const urlService = createUrlContentService(urlAdapter);
     return { fsAdapter, urlService };
+};
+
+export const createOpenAIService = () => {
+    return createOpenAIAdapter(
+        DEFAULT_CONFIG.openai.apiKey,
+        DEFAULT_CONFIG.openai.baseUrl,
+    );
 };
