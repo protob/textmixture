@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Text in, audio out, pipelines in between",
   "scripts": {
-    "verify-all": "bun tests/verifiers/verify-all.ts"
+    "verify-all": "bun tests/verifiers/verify-all.ts",
+    "start": "bun src/core/app/runners/run-with-audio-openai.ts",
+    "start:openai": "bun src/core/app/runners/run-with-audio-openai.ts"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",

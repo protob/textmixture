@@ -1,5 +1,5 @@
 import { createOutputAdapter } from '@adapters/common/output-structure-adapter';
-import { createOutputService } from '@services/output-structure-service';
+import { createOutputService } from '@services/output-service';
 import type { AudioProvider } from '@models/output-structure';
 import { logger } from '@utils/logger';
 
@@ -9,7 +9,8 @@ export const verifyOutputStructure = async () => {
     try {
         logger.info('Starting output structure verification');
 
-        const outputService = createOutputService(createOutputAdapter());
+        const outputPort = createOutputAdapter();
+        const outputService = createOutputService(outputPort);
         const seriesId = process.env.CURRENT_SERIES_ID as string;
         const date = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
 
@@ -34,7 +35,7 @@ export const verifyOutputStructure = async () => {
             languages: Object.keys(result.data.languages),
         });
 
-        // Return success  for external test runner
+        // Return success for external test runner
         if (!import.meta.main) return { success: true };
     } catch (error) {
         logger.error('Script execution failed', { error });
