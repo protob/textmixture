@@ -9,6 +9,8 @@ import { verifyEnricher } from './verify-enricher';
 import {verifyAudioOpenAI} from './verify-audio-openai';
 import { verifyAudioElevenLabs } from './verify-audio-elevenlabs';
 import { verifyDialogueAudioSynthesis } from './verify-audio-dialogue-synthesis';
+import { verifyDSP } from './verify-audio-dsp';
+
 
 import { logger } from '@utils/logger';
 
@@ -29,6 +31,7 @@ const verifiers: Verifier[] = [
     { name: 'Audio OpenAI', func: verifyAudioOpenAI },
     { name: 'Audio ElevenLabs', func: verifyAudioElevenLabs },
     { name: 'Audio Dialogue Synthesis', func: verifyDialogueAudioSynthesis },
+    { name: 'Audio DSP', func: verifyDSP },
 ];
 
 interface Result {
