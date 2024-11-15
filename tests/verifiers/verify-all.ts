@@ -10,7 +10,7 @@ import {verifyAudioOpenAI} from './verify-audio-openai';
 import { verifyAudioElevenLabs } from './verify-audio-elevenlabs';
 import { verifyDialogueAudioSynthesis } from './verify-audio-dialogue-synthesis';
 import { verifyDSP } from './verify-audio-dsp';
-
+import { verifyTranslation } from './verify-translation';
 
 import { logger } from '@utils/logger';
 
@@ -22,16 +22,17 @@ interface Verifier {
 }
 
 const verifiers: Verifier[] = [
+    { name: 'Audio OpenAI', func: verifyAudioOpenAI },
+    { name: 'Audio ElevenLabs', func: verifyAudioElevenLabs },
+    { name: 'Audio Dialogue Synthesis', func: verifyDialogueAudioSynthesis },
+    { name: 'Audio DSP', func: verifyDSP },
     { name: 'YAML Metadata Loader', func: verifyLoaderYamlMetadata },
     { name: 'Loader FS Content', func: verifyLoaderContent },
     { name: 'Loader URL Simple', func: verifyLoaderUrlSimple },
     { name: 'Loader URL Wiki', func: verifyLoaderUrlWiki },
     { name: 'Dialogue Generation', func: verifyDialogue },
     { name: 'Enricher', func: verifyEnricher },
-    { name: 'Audio OpenAI', func: verifyAudioOpenAI },
-    { name: 'Audio ElevenLabs', func: verifyAudioElevenLabs },
-    { name: 'Audio Dialogue Synthesis', func: verifyDialogueAudioSynthesis },
-    { name: 'Audio DSP', func: verifyDSP },
+    { name: 'Translation', func: verifyTranslation },
 ];
 
 interface Result {

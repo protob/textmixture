@@ -15,6 +15,7 @@ import { DEFAULT_CONFIG } from '@models/app-config';
 
 import type { AudioProviders } from '@data-access/audio-port';
 import type { FileSystemPort } from '@data-access/fs-port';
+import type { DialogueLine } from '@models/dialogue';
 
 export const initializeConfig = async (): Promise<FullConfig> => {
     const configStore = R.pipe(
@@ -103,3 +104,11 @@ export const ensureDirectories = async (fs: FileSystemPort, paths: string[]): Pr
         throw new Error(`Failed to create directories: ${failure.error}`);
     }
 };
+
+//
+export const formatDialogue = (lines: readonly DialogueLine[]): string =>
+    R.pipe(
+        lines,
+        R.map((line) => `${line.speaker}: ${line.text}`),
+        R.join('\n'),
+    );
