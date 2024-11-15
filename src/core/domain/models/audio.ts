@@ -24,10 +24,11 @@ export type OpenAIRequest = BaseRequest & {
 }
 
 export type ElevenLabsRequest = BaseRequest & {
-    readonly provider: 'elevenlabs'
-    readonly voiceId: string
-    readonly settings?: ElevenLabsSettings
-}
+    readonly provider: 'elevenlabs';
+    readonly voiceId: string;
+    readonly modelId?: string; // Change 'model' to 'modelId'
+    readonly settings?: ElevenLabsSettings;
+};
 
 export type AudioRequest = OpenAIRequest | ElevenLabsRequest
 

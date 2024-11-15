@@ -8,7 +8,7 @@ import { verifyDialogue } from './verify-dialogue';
 import { verifyEnricher } from './verify-enricher';
 import {verifyAudioOpenAI} from './verify-audio-openai';
 import { verifyAudioElevenLabs } from './verify-audio-elevenlabs';
-
+import { verifyDialogueAudioSynthesis } from './verify-audio-dialogue-synthesis';
 
 import { logger } from '@utils/logger';
 
@@ -28,6 +28,7 @@ const verifiers: Verifier[] = [
     { name: 'Enricher', func: verifyEnricher },
     { name: 'Audio OpenAI', func: verifyAudioOpenAI },
     { name: 'Audio ElevenLabs', func: verifyAudioElevenLabs },
+    { name: 'Audio Dialogue Synthesis', func: verifyDialogueAudioSynthesis },
 ];
 
 interface Result {
@@ -69,7 +70,15 @@ const runAllVerifiers = async () => {
     process.exit(failureCount > 0 ? 1 : 0);
 };
 
-if (import.meta.main) runAllVerifiers();
+if (import.meta.main) {
+    runAllVerifiers().catch((error) => {
+        logger.error('Unhandled error in runAllVerifiers', {
+            error: error instanceof Error ? error.message : String(error),
+        });
+        process.exit(1);
+    });
+}
+
 
 
 export { runAllVerifiers };

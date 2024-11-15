@@ -6,9 +6,15 @@ import { createFsAdapter } from '@adapters/common/fs-adapter';
 import { createUrlFsAdapter } from '@adapters/loaders/url-loader';
 import { createUrlContentService } from '@services/url-content-service';
 import { createOpenAIAdapter } from '@adapters/api/openai';
+import { createOpenAIAudioAdapter } from '@adapters/api/openai-audio';
+import { createElevenLabsAudioAdapter } from '@adapters/api/elevenlabs-audio';
+
 import type { FullConfig } from '@models/yaml-metadata';
 import type { UrlContentPort } from '@data-access/url-content-port';
 import { DEFAULT_CONFIG } from '@models/app-config';
+
+import type { AudioProviders } from '@data-access/audio-port';
+import type { FileSystemPort } from '@data-access/fs-port';
 
 export const initializeConfig = async (): Promise<FullConfig> => {
     const configStore = R.pipe(
@@ -75,3 +81,25 @@ export const createSampleDialogue = () => ({
     systemPrompt: `You are simulating a conversation between Alice and Bob. Alice is a scientific researcher. Bob is a software engineer. Use natural dialogue to explore technical topics.`,
     userPrompt: `Generate a short dialogue about the current state of quantum computing technology. Focus on explaining recent advancements of quantum computing. Keep it engaging but accurate. ~4 lines of dialogue.`,
 });
+
+//
+export const createAudioProviders = (): AudioProviders => ({
+    openai: createOpenAIAudioAdapter(
+        DEFAULT_CONFIG.openai.apiKey,
+        DEFAULT_CONFIG.openai.baseUrl,
+    ),
+    elevenlabs: createElevenLabsAudioAdapter(
+        DEFAULT_CONFIG.elevenlabs.apiKey,
+        DEFAULT_CONFIG.elevenlabs.baseUrl,
+    ),
+});
+
+//
+export const ensureDirectories = async (fs: FileSystemPort, paths: string[]): Promise<void> => {
+    const results = await Promise.all(paths.map(fs.ensureDir));
+    const failure = R.find(results, (r) => !r.ok);
+
+    if (failure && !failure.ok) {
+        throw new Error(`Failed to create directories: ${failure.error}`);
+    }
+};
