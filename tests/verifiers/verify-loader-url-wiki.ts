@@ -1,4 +1,4 @@
-// src/scripts/verify-loader-url-simple.ts
+// src/scripts/verify-loader-url-wiki.ts
 
 import { logger } from '@utils/logger';
 
@@ -8,24 +8,22 @@ import {
     countResults,
 } from './helpers';
 
-import { processSimpleContent } from '@services/url-processors';
+import { processWikiContent } from '@services/url-processors';
 
-const getSampleUrls = (): string[] => [
-    'https://blogs.nvidia.com/blog/what-is-quantum-computing/',
-];
+const getWikiUrls = (): string[] => ['https://en.wikipedia.org/wiki/Quantum_computing'];
 
-export const verifyLoaderUrlSimple = async () => {
+export const verifyLoaderUrlWiki = async () => {
     try {
-        logger.info('Verifying Simple URL loader...');
+        logger.info('Verifying Wiki URL loader...');
 
         const { urlService } = createFsAndUrlServices();
 
-        const urls = getSampleUrls();
-        const results = await processUrls(urls, urlService, processSimpleContent);
+        const urls = getWikiUrls();
+        const results = await processUrls(urls, urlService, processWikiContent);
 
         const { successCount, failureCount } = countResults(results);
 
-        logger.info('Simple URL loader validation completed', {
+        logger.info('Wiki URL loader validation completed', {
             total: results.length,
             success: successCount,
             failures: failureCount,
@@ -34,7 +32,9 @@ export const verifyLoaderUrlSimple = async () => {
         // Return success for external test runner
         if (!import.meta.main) return { success: true };
     } catch (error) {
-        logger.error('Script execution failed', { error });
+        logger.error('Script execution failed', {
+            error: error instanceof Error ? error.message : String(error),
+        });
 
         // Return failure for external test runner
         if (!import.meta.main)
@@ -44,5 +44,6 @@ export const verifyLoaderUrlSimple = async () => {
     }
 };
 
-if (import.meta.main) verifyLoaderUrlSimple();
-
+if (import.meta.main) {
+    verifyLoaderUrlWiki();
+}

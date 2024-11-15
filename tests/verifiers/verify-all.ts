@@ -3,6 +3,7 @@ import * as R from 'remeda';
 import { verifyLoaderYamlMetadata } from './verify-loader-yaml-metadata';
 import { verifyLoaderContent } from './verify-loader-content';
 import { verifyLoaderUrlSimple } from './verify-loader-url-simple';
+import { verifyLoaderUrlWiki } from './verify-loader-url-wiki';
 
 import { logger } from '@utils/logger';
 
@@ -17,6 +18,7 @@ const verifiers: Verifier[] = [
     { name: 'YAML Metadata Loader', func: verifyLoaderYamlMetadata },
     { name: 'Loader FS Content', func: verifyLoaderContent },
     { name: 'Loader URL Simple', func: verifyLoaderUrlSimple },
+    { name: 'Loader URL Wiki', func: verifyLoaderUrlWiki },
 ];
 
 interface Result {
