@@ -2,6 +2,7 @@ import * as R from 'remeda';
 
 import { verifyLoaderYamlMetadata } from './verify-loader-yaml-metadata';
 import { verifyLoaderContent } from './verify-loader-content';
+import { verifyLoaderUrlSimple } from './verify-loader-url-simple';
 
 import { logger } from '@utils/logger';
 
@@ -14,7 +15,8 @@ interface Verifier {
 
 const verifiers: Verifier[] = [
     { name: 'YAML Metadata Loader', func: verifyLoaderYamlMetadata },
-    { name: 'Content FS Loader', func: verifyLoaderContent },
+    { name: 'Loader FS Content', func: verifyLoaderContent },
+    { name: 'Loader URL Simple', func: verifyLoaderUrlSimple },
 ];
 
 interface Result {
@@ -56,8 +58,7 @@ const runAllVerifiers = async () => {
     process.exit(failureCount > 0 ? 1 : 0);
 };
 
-if (import.meta.main) {
-    runAllVerifiers();
-}
+if (import.meta.main) runAllVerifiers();
+
 
 export { runAllVerifiers };
