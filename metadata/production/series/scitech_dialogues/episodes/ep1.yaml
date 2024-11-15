@@ -3,7 +3,7 @@ epNumber: 1
 SeriesID: scitech_dialogues
 TopicID: quantum_computing
 localSources:
-  - input/quantum_intro.md
+  - input/quantum_computing_sample.md
 urlSources:
   - https://en.wikipedia.org/wiki/Quantum_computing
 title: Foundations of Quantum Computing

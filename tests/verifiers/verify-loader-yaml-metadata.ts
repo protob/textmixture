@@ -27,6 +27,5 @@ export const verifyLoaderYamlMetadata = async (): Promise<{ success: boolean; er
     }
 };
 
-if (import.meta.main) {
-    verifyLoaderYamlMetadata();
-}
+if (import.meta.main) verifyLoaderYamlMetadata();
+
