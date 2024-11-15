@@ -11,6 +11,8 @@ import { verifyAudioElevenLabs } from './verify-audio-elevenlabs';
 import { verifyDialogueAudioSynthesis } from './verify-audio-dialogue-synthesis';
 import { verifyDSP } from './verify-audio-dsp';
 import { verifyTranslation } from './verify-translation';
+import { verifyOutputStructure } from './verify-output-structure';
+
 
 import { logger } from '@utils/logger';
 
@@ -33,6 +35,7 @@ const verifiers: Verifier[] = [
     { name: 'Dialogue Generation', func: verifyDialogue },
     { name: 'Enricher', func: verifyEnricher },
     { name: 'Translation', func: verifyTranslation },
+    { name: 'Output Structure', func: verifyOutputStructure },
 ];
 
 interface Result {
