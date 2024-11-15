@@ -69,3 +69,9 @@ export const createOpenAIService = () => {
         DEFAULT_CONFIG.openai.baseUrl,
     );
 };
+
+//
+export const createSampleDialogue = () => ({
+    systemPrompt: `You are simulating a conversation between Alice and Bob. Alice is a scientific researcher. Bob is a software engineer. Use natural dialogue to explore technical topics.`,
+    userPrompt: `Generate a short dialogue about the current state of quantum computing technology. Focus on explaining recent advancements of quantum computing. Keep it engaging but accurate. ~4 lines of dialogue.`,
+});

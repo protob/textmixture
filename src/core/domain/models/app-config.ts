@@ -1,4 +1,3 @@
-// src/pure/domain/models/app-config.ts
 import type { OpenAIModelConfig } from '@models/openai'
 
 export type AppConfig = {
@@ -13,7 +12,7 @@ export type AppConfig = {
     }
 }
 
-// This could be loaded from env or file in the future
+// This could be loaded from env in the future
 export const DEFAULT_CONFIG: AppConfig = {
     openai: {
         textModel: {

@@ -1,11 +1,9 @@
-// src/pure/domain/models/openai.ts
 export type OpenAIModelConfig = {
     readonly name: string
     readonly temperature: number
     readonly maxTokens: number
     readonly stop?: readonly string[]
 }
-
 
 
 export type OpenAIMessage = {

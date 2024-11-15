@@ -1,10 +1,8 @@
-// src/pure/domain/models/config.ts
 import type { Result, AsyncResult } from '@shared-types/result'
 import { z } from 'zod'
 
 
 import {
-
     currentConfigSchema,
     characterConfigSchema,
     styleConfigSchema,

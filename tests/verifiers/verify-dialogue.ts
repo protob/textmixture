@@ -1,15 +1,8 @@
-// src/scripts/verify-dialogue.ts
-
 import { createDialogueService } from '@services/dialogue-service';
 import { logger } from '@utils/logger';
-import { createOpenAIService } from './helpers';
+import { createOpenAIService, createSampleDialogue } from './helpers';
 import type { DialogueLine } from '@models/dialogue';
-import {DEFAULT_CONFIG} from "@models/app-config";
-
-const createTestPrompts = () => ({
-    systemPrompt: `You are simulating a conversation between Alice and Bob. Alice is a scientific researcher. Bob is a software engineer. Use natural dialogue to explore technical topics.`,
-    userPrompt: `Generate a short dialogue about the current state of quantum computing technology. Focus on explaining recent advancements of quantum computing. Keep it engaging but accurate. ~4 lines of dialogue.`,
-});
+import { DEFAULT_CONFIG } from "@models/app-config";
 
 const displayDialogue = (lines: readonly DialogueLine[]) =>
     lines.forEach(line => console.log(`${line.speaker}: ${line.text}`));
@@ -19,12 +12,11 @@ export const verifyDialogue = async () => {
 
     const openaiAdapter = createOpenAIService();
     const dialogueService = createDialogueService(openaiAdapter);
-    const prompts = createTestPrompts();
     const model = DEFAULT_CONFIG.openai.textModel.name;
     const temperature = DEFAULT_CONFIG.openai.textModel.temperature;
 
     const result = await dialogueService.generateDialogue({
-        ...prompts,
+        ...createSampleDialogue(),
         options: { model, temperature },
     });
 
