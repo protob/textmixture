@@ -44,6 +44,5 @@ export const verifyLoaderUrlWiki = async () => {
     }
 };
 
-if (import.meta.main) {
-    verifyLoaderUrlWiki();
-}
+if (import.meta.main) verifyLoaderUrlWiki();
+
