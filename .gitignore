@@ -32,3 +32,6 @@ jspm_packages/
 *.temp
 
 .idea/
+
+
+get.sh

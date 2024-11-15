@@ -4,6 +4,7 @@
     "type": "module",
     "description": "Text in, audio out, pipelines in between",
     "scripts": {
+      "verify-all": "bun tests/verifiers/verify-all.ts"
     },
     "dependencies": {
       "@mozilla/readability": "^0.5.0",
