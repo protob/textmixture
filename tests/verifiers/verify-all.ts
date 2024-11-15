@@ -6,6 +6,7 @@ import { verifyLoaderUrlSimple } from './verify-loader-url-simple';
 import { verifyLoaderUrlWiki } from './verify-loader-url-wiki';
 import { verifyDialogue } from './verify-dialogue';
 import { verifyEnricher } from './verify-enricher';
+import {verifyAudioOpenAI} from './verify-audio-openai';
 
 import { logger } from '@utils/logger';
 
@@ -23,6 +24,7 @@ const verifiers: Verifier[] = [
     { name: 'Loader URL Wiki', func: verifyLoaderUrlWiki },
     { name: 'Dialogue Generation', func: verifyDialogue },
     { name: 'Enricher', func: verifyEnricher },
+    { name: 'Audio OpenAI', func: verifyAudioOpenAI },
 ];
 
 interface Result {
