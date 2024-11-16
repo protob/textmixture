@@ -7,7 +7,8 @@
     "verify-all": "bun tests/verifiers/verify-all.ts",
     "start": "bun src/core/app/runners/run-with-audio-openai.ts",
     "start:openai": "bun src/core/app/runners/run-with-audio-openai.ts",
-    "start:elevenlabs": "bun src/core/app/runners/run-with-audio-elevenlabs.ts"
+    "start:elevenlabs": "bun src/core/app/runners/run-with-audio-elevenlabs.ts",
+    "start:mixed": "bun src/core/app/runners/run-with-audio-mixed.ts"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
