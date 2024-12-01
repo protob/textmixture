@@ -11,7 +11,7 @@ import type { DSPContext } from '@steps/types-audio-context';
 import type { Result } from '@shared-types/result';
 import { logger } from '@utils/logger';
 
-export const SKIP_GENERATION_STEPS = false;
+export const SKIP_GENERATION_STEPS = true;
 
 const handleError = (error: unknown): never => {
     logger.error('Runner execution failed', {

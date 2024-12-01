@@ -5,7 +5,7 @@ export type ContentData = { readonly content: string };
 
 export type AudioSegment = {
     readonly path: string;
-    readonly provider: 'openai' | 'elevenlabs'; // Adjusted type
+    readonly provider: 'openai' | 'elevenlabs' | 'mixed_providers';
     readonly characterId: string;
 };
 
@@ -22,15 +22,12 @@ export type AudioData = {
 
 export type WithPath = { readonly outputPath: string };
 
-export type AudioBaseContext = BaseContext &
-    WithPath & {
+export type AudioBaseContext = BaseContext & WithPath & {
     readonly audio: AudioData;
 };
 
 export type WithOptionalContent = { readonly content?: string };
-
 export type WithContent = { readonly content: string };
-
 export type WithDialogue = { readonly dialogue: DialogueContent };
 
 export type FullAudioContext = AudioBaseContext & WithContent & WithDialogue;

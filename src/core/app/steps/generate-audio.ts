@@ -4,13 +4,14 @@ import type { PipelineStep } from './types'
 import type { AudioPort } from '@data-access/audio-port'
 import type { FileSystemPort } from '@data-access/fs-port'
 import type { CharacterConfig } from '@models/yaml-metadata'
-import type { AudioSegment, FullAudioContext } from './types-audio-context'
+import type { FullAudioContext } from './types-audio-context'
 import type { AudioRequest, ElevenLabsSettings, OpenAIVoice } from '@models/audio'
 import type { DialogueLine } from '@models/dialogue'
 import type { Result } from '@shared-types/result'
+import { createTTSQueueService } from '@services/tts-queue-service';
 import { logger } from '@utils/logger'
 
-export const OUTPUT_SEGMENT_LIMIT = 2
+export const OUTPUT_SEGMENT_LIMIT = 2 //  number like 999999 for all items
 
 const findCharacter = (characters: readonly CharacterConfig[], speakerName: string): CharacterConfig | undefined =>
     R.find(characters, char => char.name.toLowerCase() === speakerName.toLowerCase())
@@ -18,10 +19,7 @@ const findCharacter = (characters: readonly CharacterConfig[], speakerName: stri
 const getProviderForSegment = (index: number): 'openai' | 'elevenlabs' =>
     index % 2 === 0 ? 'openai' : 'elevenlabs'
 
-const getEffectiveProvider = (
-    provider: 'openai' | 'elevenlabs' | 'mixed_providers',
-    index: number
-): 'openai' | 'elevenlabs' =>
+const getEffectiveProvider = (provider: 'openai' | 'elevenlabs' | 'mixed_providers', index: number): 'openai' | 'elevenlabs' =>
     provider === 'mixed_providers' ? getProviderForSegment(index) : provider
 
 type VoiceConfigResult = Result<{
@@ -30,14 +28,10 @@ type VoiceConfigResult = Result<{
         model?: string
         modelId?: string
         settings?: ElevenLabsSettings
-    }
+    }  
 }>
 
-const getVoiceConfig = (
-    character: CharacterConfig,
-    effectiveProvider: 'openai' | 'elevenlabs',
-    speakerName: string
-): VoiceConfigResult => {
+const getVoiceConfig = (character: CharacterConfig, effectiveProvider: 'openai' | 'elevenlabs', speakerName: string): VoiceConfigResult => {
     if (effectiveProvider === 'openai') {
         const voiceSettings = character.voiceSettings.openai
         if (!voiceSettings?.voiceId) {
@@ -73,12 +67,7 @@ const getVoiceConfig = (
 const createAudioRequest = (
     line: DialogueLine,
     index: number,
-    voiceConfig: {
-        voiceId: string
-        model?: string
-        modelId?: string
-        settings?: ElevenLabsSettings
-    },
+    voiceConfig: { voiceId: string, model?: string, modelId?: string, settings?: ElevenLabsSettings },
     effectiveProvider: 'openai' | 'elevenlabs'
 ): AudioRequest => {
     const metadata = {
@@ -105,70 +94,6 @@ const createAudioRequest = (
     }
 }
 
-type GenerateAudioConfig = {
-    ports: {
-        audio: AudioPort
-        fs: FileSystemPort
-    }
-    request: AudioRequest
-    outputDir: string
-    index: number
-    speaker: string
-}
-
-const generateAndSaveAudioSegment =
-    async ({ports, request, outputDir, index, speaker }: GenerateAudioConfig): Promise<Result<AudioSegment>> => {
-        const result = await ports.audio.generateAudio(request)
-        if (!result.ok) return result
-
-        await ports.fs.ensureDir(outputDir)
-        const segmentPath = `${outputDir}/segment_${index}_${speaker.toLowerCase()}.mp3`
-        const saveResult = await ports.fs.writeFile(segmentPath, result.data.data)
-
-        if (!saveResult.ok) {
-            return { ok: false, error: `Failed to save audio: ${saveResult.error}` }
-        }
-
-        return {
-            ok: true,
-            data: {
-                path: segmentPath,
-                provider: request.provider,
-                characterId: speaker
-            }
-        }
-}
-
-type ProcessLineConfig = {
-    line: DialogueLine
-    index: number
-    context: DialogueContext
-    provider: 'openai' | 'elevenlabs' | 'mixed_providers'
-    ports: {
-        audio: AudioPort
-        fs: FileSystemPort
-    }
-    outputPath: string
-    language: string
-}
-
-const processLine =
-    async ({line, index, context, provider, ports, outputPath, language }: ProcessLineConfig): Promise<Result<AudioSegment>> => {
-        const character = findCharacter(context.config.characters, line.speaker)
-        if (!character || !character.voiceSettings) {
-            return { ok: false, error: `Character not found or missing voice settings: ${line.speaker}` }
-        }
-
-        const effectiveProvider = getEffectiveProvider(provider, index)
-        const voiceConfigResult = getVoiceConfig(character, effectiveProvider, line.speaker)
-        if (!voiceConfigResult.ok) return voiceConfigResult
-
-        const request = createAudioRequest(line, index, voiceConfigResult.data.voiceConfig, effectiveProvider)
-        const outputDir = `${outputPath}/${language}/${provider}/segments`
-
-        return generateAndSaveAudioSegment({ports, request, outputDir, index, speaker: line.speaker})
-}
-
 export const createAudioGenerationStep = (
     audioPort: AudioPort,
     fsPort: FileSystemPort,
@@ -179,28 +104,58 @@ export const createAudioGenerationStep = (
     try {
         logger.info('Starting audio generation')
 
-        const ports = { audio: audioPort, fs: fsPort }
-        const results = await R.pipe(
+        const ttsQueueService = createTTSQueueService(audioPort);
+
+        const requests = R.pipe(
             context.dialogue.lines,
             R.take(OUTPUT_SEGMENT_LIMIT),
-            lines => Promise.all(lines.map(line =>
-                processLine({ line, index: line.index, context, provider, ports, outputPath, language })
-            ))
-        )
+            R.map((line, index) => {
+                const character = findCharacter(context.config.characters, line.speaker);
+                if (!character || !character.voiceSettings) {
+                    throw new Error(`Character not found or missing voice settings: ${line.speaker}`);
+                }
+                
+                const effectiveProvider = getEffectiveProvider(provider, index);
+                const voiceConfigResult = getVoiceConfig(character, effectiveProvider, line.speaker);
+                if (!voiceConfigResult.ok) throw new Error(voiceConfigResult.error);
 
-        const failure = R.find(results, (r): r is { ok: false; error: string } => !r.ok)
-        if (failure) return failure
+                return createAudioRequest(line, index, voiceConfigResult.data.voiceConfig, effectiveProvider);
+            })
+        );
 
-        const segments = R.pipe(
-            results,
-            R.filter((r): r is { ok: true; data: AudioSegment } => r.ok),
-            R.map(r => r.data)
-        )
+        const queueResult = await ttsQueueService.processQueue(requests);
+
+        if (!queueResult.ok) {
+            return { ok: false, error: queueResult.error };
+        }
+
+        const segments = await Promise.all(
+            queueResult.data.successes.map(async (success, index) => {
+                const outputDir = `${outputPath}/${language}/${provider}/segments`;
+                await fsPort.ensureDir(outputDir);
+
+                const speaker = context.dialogue.lines[index].speaker.toLowerCase();
+                const fileName = `segment_${index}_${speaker}.mp3`;
+                const segmentPath = `${outputDir}/${fileName}`;
+
+                const saveResult = await fsPort.writeFile(segmentPath, success.data.data);
+
+                if (!saveResult.ok) {
+                    throw new Error(`Failed to save audio: ${saveResult.error}`);
+                }
+
+                return {
+                    path: segmentPath,
+                    provider: success.request.provider,
+                    characterId: speaker
+                };
+            })
+        );
 
         logger.success('Audio generation completed', {
             totalSegments: segments.length,
             provider
-        })
+        });
 
         return {
             ok: true,
@@ -216,10 +171,10 @@ export const createAudioGenerationStep = (
                     }
                 }
             }
-        }
+        };
     } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error)
-        logger.error('Audio generation failed', { error: msg })
-        return { ok: false, error: msg }
+        const msg = error instanceof Error ? error.message : String(error);
+        logger.error('Audio generation failed', { error: msg });
+        return { ok: false, error: msg };
     }
-}
+};
