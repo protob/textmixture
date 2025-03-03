@@ -1,6 +1,6 @@
 import type { Result } from '@shared-types/result'
 import type { FullConfig } from '@models/yaml-metadata'
-import { createYamlMetadataService } from '@services/yaml-metadata-service' // Ensure this is correctly imported
+import { createYamlMetadataService } from '@services/yaml-metadata-service' 
 
 export const createYamlMetadataStore = (configService: ReturnType<typeof createYamlMetadataService>) => {
     let state = { configs: null as FullConfig | null, initialized: false }
